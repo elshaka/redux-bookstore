@@ -7,63 +7,54 @@ import { createBook } from '../../actions';
 import './books-form.css';
 import withCategories from '../../components/HOC/withCategories';
 
-class BooksForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initialState = {
-      title: '',
-      category: props.categories[0],
-    };
-    this.state = this.initialState;
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-  }
+const BooksForm = ({ createBook, categories }) => {
+  const initialBook = {
+    title: '',
+    category: categories[0],
+  };
+  const [book, setBook] = React.useState(initialBook);
 
-  handleSubmit(e) {
-    const { title, category } = this.state;
-    const { createBook } = this.props;
+  const handleSubmit = e => {
     e.preventDefault();
 
-    if (title) {
-      createBook({ id: uniqid(), title, category });
-      this.setState(this.initialState);
+    if (book.title) {
+      createBook({ id: uniqid(), ...book });
+      setBook(initialBook);
     }
-  }
+  };
+  const handleChange = e => {
+    setBook({
+      ...book,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  handleChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-  }
-
-  render() {
-    const { title, category } = this.state;
-    const { categories } = this.props;
-    return (
-      <div className="books-form">
-        <h2 className="form-header">Add new book</h2>
-        <form onSubmit={this.handleSubmit}>
-          <input
-            type="text"
-            placeholder="Title"
-            name="title"
-            value={title}
-            onChange={this.handleChange}
-            className="new-book-input"
-          />
-          <select
-            name="category"
-            id="category"
-            value={category}
-            onChange={this.handleChange}
-            className="new-book-category"
-          >
-            {categories.map(cat => (<option key={cat} value={cat}>{cat}</option>))}
-          </select>
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="books-form">
+      <h2 className="form-header">Add new book</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Title"
+          name="title"
+          value={book.title}
+          onChange={handleChange}
+          className="new-book-input"
+        />
+        <select
+          name="category"
+          id="category"
+          value={book.category}
+          onChange={handleChange}
+          className="new-book-category"
+        >
+          {categories.map(cat => (<option key={cat} value={cat}>{cat}</option>))}
+        </select>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+  );
+};
 
 BooksForm.propTypes = {
   createBook: PropTypes.func.isRequired,
